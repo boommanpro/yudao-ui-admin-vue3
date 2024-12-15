@@ -1,3 +1,6 @@
+// 引入worker.js
+import './worker.js'
+
 // 引入unocss css
 import '@/plugins/unocss'
 
