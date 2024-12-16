@@ -9,14 +9,14 @@
   >
     <el-table :data="formData" class="-mt-10px">
       <el-table-column label="序号" type="index" width="100" />
-       <el-table-column label="变量名称" min-width="150">
+       <el-table-column label="变量名称" min-width="300">
         <template #default="{ row, $index }">
           <el-form-item :prop="`${$index}.variableName`" :rules="formRules.variableName" class="mb-0px!">
             <el-input v-model="row.variableName" placeholder="请输入变量名称，不能为空" />
           </el-form-item>
         </template>
       </el-table-column>
-      <el-table-column label="表达式类型" min-width="150">
+      <el-table-column label="表达式类型" min-width="200">
         <template #default="{ row, $index }">
 
           <el-form-item :prop="`${$index}.expressionType`" :rules="formRules.expressionType" class="mb-0px!">
@@ -31,7 +31,7 @@
           </el-form-item>
         </template>
       </el-table-column>
-      <el-table-column label="变量表达式" min-width="150">
+      <el-table-column label="变量表达式" min-width="500">
         <template #default="{ row, $index }">
           <el-form-item :prop="`${$index}.variableExpression`" :rules="formRules.variableExpression" class="mb-0px!">
             <el-input v-model="row.variableExpression" placeholder="请输入变量表达式，标识变量的具体表达式，不能为空" />

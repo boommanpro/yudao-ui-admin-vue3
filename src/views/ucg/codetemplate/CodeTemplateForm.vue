@@ -13,6 +13,9 @@
       <el-form-item label="模板描述" prop="templateDescription">
         <el-input v-model="formData.templateDescription" type="textarea" placeholder="请输入模板描述" />
       </el-form-item>
+      <el-form-item label="模板内容" prop="templateContent">
+        <monaco-vite :width="1200" :height="500" v-model:="formData.templateContent" language="java"/>
+      </el-form-item>
       <el-form-item label="模板类型 " prop="templateType">
         <el-select v-model="formData.templateType" placeholder="请选择模板类型 ">
           <el-option
@@ -48,9 +51,6 @@
       </el-form-item>
       <el-form-item label="原始路径" prop="originalPath">
         <el-input v-model="formData.originalPath" placeholder="请输入原始路径" />
-      </el-form-item>
-      <el-form-item label="模板内容" prop="templateContent">
-        <monaco-vite :width="1200" :height="500" v-model:="formData.templateContent" language="java"/>
       </el-form-item>
     </el-form>
     <template #footer>

@@ -3,12 +3,17 @@
   <ContentWrap>
     <el-table v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="true">
       <el-table-column label="编号" align="center" prop="id" />
-       <el-table-column label="变量名称" align="center" prop="variableName" />
-      <el-table-column label="表达式类型" align="center" prop="expressionType" />
-      <el-table-column label="变量表达式" align="center" prop="variableExpression" />
+      <el-table-column label="变量名称" align="center" prop="variableName" />
+
+      <el-table-column label="表达式类型" align="center" prop="expressionType" >
+        <template #default="scope">
+          <dict-tag :type="DICT_TYPE.EXPRESSION_TYPE" :value="scope.row.expressionType" />
+        </template>
+      </el-table-column>
+      <el-table-column label="变量表达式" align="center" prop="variableExpression" width="500px"/>
       <el-table-column label="执行顺序" align="center" prop="executeOrder" />
       <el-table-column
-        label="创建时间，默认为当前时间戳"
+        label="创建时间"
         align="center"
         prop="createTime"
         :formatter="dateFormatter"
@@ -20,6 +25,7 @@
 <script setup lang="ts">
 import { dateFormatter } from '@/utils/formatTime'
 import { ProjectApi } from '@/api/ucg/project'
+import {DICT_TYPE} from "@/utils/dict";
 
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
