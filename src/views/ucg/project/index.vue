@@ -64,12 +64,12 @@
         <el-button
           type="success"
           plain
-          @click="handleExport"
+          @click="handleImport"
           :loading="exportLoading"
           v-hasPermi="['ucg:project:export']"
         >
           <Icon icon="ep:download" class="mr-5px"/>
-          导出
+          导入
         </el-button>
       </el-form-item>
     </el-form>
@@ -131,6 +131,14 @@
           </el-button>
           <el-button
             link
+            type="primary"
+            @click="toExport( scope.row.id)"
+            v-hasPermi="['ucg:code-template:export']"
+          >
+            导出
+          </el-button>
+          <el-button
+            link
             type="danger"
             @click="handleDelete(scope.row.id)"
             v-hasPermi="['ucg:project:delete']"
@@ -160,6 +168,8 @@ import download from '@/utils/download'
 import {ProjectApi, ProjectVO} from '@/api/ucg/project'
 import ProjectForm from './ProjectForm.vue'
 import ProjectVariableList from './components/ProjectVariableList.vue'
+import {ElMessage} from "element-plus";
+import {CodeTemplateApi} from "@/api/ucg/codetemplate";
 
 /** 存储项目的基本信息 列表 */
 defineOptions({name: 'Project'})
@@ -179,7 +189,6 @@ const queryParams = reactive({
   createTime: []
 })
 const queryFormRef = ref() // 搜索的表单
-const exportLoading = ref(false) // 导出的加载中
 
 /** 查询列表 */
 const getList = async () => {
@@ -225,21 +234,63 @@ const handleDelete = async (id: number) => {
   }
 }
 
-/** 导出按钮操作 */
-const handleExport = async () => {
+const exportLoading = ref(false); // 导出的加载中
+
+/** 导入按钮操作 */
+/** 导入按钮操作 */
+const handleImport = async () => {
+  try {
+    // 创建一个文件输入元素
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json'; // 根据实际情况调整接受的文件类型
+
+    // 监听文件选择事件
+    input.onchange = async (event) => {
+      const files = (event.target as HTMLInputElement).files;
+      if (!files || files.length === 0) {
+        ElMessage.warning('请选择一个文件');
+        return;
+      }
+
+      const file = files[0] ;
+      const formData = new FormData();
+      formData.append('file', file);
+
+      exportLoading.value = true;
+      try {
+        // 假设 ProjectApi 提供了一个 importProject 方法
+        await ProjectApi.importProject(formData);
+        ElMessage.success('导入成功');
+        // 刷新列表
+        await getList();
+      } catch (error) {
+        ElMessage.error('导入失败: ' + error.message);
+      } finally {
+        exportLoading.value = false;
+      }
+    };
+
+    // 触发文件选择对话框
+    input.click();
+  } catch (error) {
+    ElMessage.error('导入失败: ' + error.message);
+  }
+};
+
+const toExport = async (id:number) => {
   try {
     // 导出的二次确认
     await message.exportConfirm()
     // 发起导出
     exportLoading.value = true
-    const data = await ProjectApi.exportProject(queryParams)
-    download.excel(data, '存储项目的基本信息.xls')
+    const data = await ProjectApi.export(id)
+    download.json(data, id+'.json')
   } catch {
   } finally {
     exportLoading.value = false
   }
 }
-
 const router = useRouter();
 /** 查看代码模板 */
 const toEditCodeTemplate = (id: number) => {

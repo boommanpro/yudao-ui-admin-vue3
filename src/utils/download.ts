@@ -29,6 +29,11 @@ const download = {
   html: (data: Blob, fileName: string) => {
     download0(data, fileName, 'text/html')
   },
+  json: (data: any, fileName: string) => {
+    const jsonString = JSON.stringify(data, null, 2); // 使用 2 个空格进行缩进，便于阅读
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    download0(blob, fileName, 'application/json')
+  },
   // 下载 Markdown 方法
   markdown: (data: Blob, fileName: string) => {
     download0(data, fileName, 'text/markdown')

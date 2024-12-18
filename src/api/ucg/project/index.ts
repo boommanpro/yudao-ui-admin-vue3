@@ -49,5 +49,14 @@ export const ProjectApi = {
   // 获得存储与项目相关的变量信息列表
   getProjectVariableListByProjectId: async (projectId) => {
     return await request.get({ url: `/ucg/project/project-variable/list-by-project-id?projectId=` + projectId })
+  },
+
+  importProject: async ( formData: FormData) => {
+    return await request.upload({url: `/ucg/project/importProject`,  data: formData})
+  },
+
+  // 导出存储代码模板的基本信息 Excel
+  export: async (id: number) => {
+    return await request.download({ url: `/ucg/project/exportProject?id=`+id })
   }
 }
