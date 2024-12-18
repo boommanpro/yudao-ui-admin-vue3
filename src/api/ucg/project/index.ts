@@ -29,6 +29,10 @@ export const ProjectApi = {
   updateProject: async (data: ProjectVO) => {
     return await request.put({ url: `/ucg/project/update`, data })
   },
+  // 复制存储项目的基本信息
+  copyProject: async (data: ProjectVO) => {
+    return await request.post({ url: `/ucg/project/copy`, data })
+  },
 
   // 删除存储项目的基本信息
   deleteProject: async (id: number) => {

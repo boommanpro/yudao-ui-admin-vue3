@@ -55,13 +55,18 @@
           <Icon class="mr-5px" icon="ep:zoom-in" />
           导入
         </el-button>
+        <el-button v-hasPermi="['infra:codegen:preview']" type="primary" @click="handleBatchPreview()">
+          <Icon class="mr-5px" icon="ep:zoom-in" />
+          批量预览
+        </el-button>
       </el-form-item>
     </el-form>
   </ContentWrap>
 
   <!-- 列表 -->
   <ContentWrap>
-    <el-table v-loading="loading" :data="list">
+    <el-table v-loading="loading" :data="list" ref="multipleTableRef"   @selection-change="handleSelectionChange" >
+      <el-table-column align="center" type="selection" width="55" />
       <el-table-column align="center" label="数据源">
         <template #default="scope">
           {{
@@ -158,6 +163,7 @@ import * as CodegenApi from '@/api/infra/codegen'
 import * as DataSourceConfigApi from '@/api/infra/dataSourceConfig'
 import ImportTable from './ImportTable.vue'
 import PreviewCode from './PreviewCode.vue'
+import {ElTable} from "element-plus";
 
 defineOptions({ name: 'InfraCodegen' })
 
@@ -247,6 +253,24 @@ const handleSyncDB = async (row: CodegenApi.CodegenTableVO) => {
 const handleGenTable = async (row: CodegenApi.CodegenTableVO) => {
   const res = await CodegenApi.downloadCodegen(row.id)
   download.zip(res, 'codegen-' + row.className + '.zip')
+}
+
+const multipleTableRef = ref<InstanceType<typeof ElTable>>()
+
+// 处理选中项变化
+const selectedRows = ref<CodegenApi.CodegenTableVO[]>([])
+const handleSelectionChange = (rows: CodegenApi.CodegenTableVO[]) => {
+  selectedRows.value = rows
+}
+
+// 批量预览操作
+const handleBatchPreview = async () => {
+  if (selectedRows.value.length === 0) {
+    message.warning('请选择要预览的记录')
+    return
+  }
+  console.log(selectedRows.value.map(row => row.id))
+  previewRef.value.open(selectedRows.value.map(row => row.id))
 }
 
 /** 初始化 **/

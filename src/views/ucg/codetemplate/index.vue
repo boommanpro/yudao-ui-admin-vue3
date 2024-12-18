@@ -101,15 +101,22 @@
         />
       </el-form-item>
       <el-form-item>
-        <el-button @click="handleQuery"><Icon icon="ep:search" class="mr-5px" /> 搜索</el-button>
-        <el-button @click="resetQuery"><Icon icon="ep:refresh" class="mr-5px" /> 重置</el-button>
+        <el-button @click="handleQuery">
+          <Icon icon="ep:search" class="mr-5px"/>
+          搜索
+        </el-button>
+        <el-button @click="resetQuery">
+          <Icon icon="ep:refresh" class="mr-5px"/>
+          重置
+        </el-button>
         <el-button
           type="primary"
           plain
           @click="openForm('create')"
           v-hasPermi="['ucg:code-template:create']"
         >
-          <Icon icon="ep:plus" class="mr-5px" /> 新增
+          <Icon icon="ep:plus" class="mr-5px"/>
+          新增
         </el-button>
         <el-button
           type="success"
@@ -118,7 +125,8 @@
           :loading="exportLoading"
           v-hasPermi="['ucg:code-template:export']"
         >
-          <Icon icon="ep:download" class="mr-5px" /> 导出
+          <Icon icon="ep:download" class="mr-5px"/>
+          导出
         </el-button>
       </el-form-item>
     </el-form>
@@ -127,27 +135,27 @@
   <!-- 列表 -->
   <ContentWrap>
     <el-table v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="true">
-      <el-table-column label="编号" align="center" prop="id" />
-      <el-table-column label="项目id" align="center" prop="projectId" />
-      <el-table-column label="模板名称" align="center" prop="templateName" />
-      <el-table-column label="模板描述" align="center" prop="templateDescription" />
-      <el-table-column label="模板类型 " align="center" prop="templateType">
+      <el-table-column label="编号" align="center" prop="id" width="80px"/>
+      <el-table-column label="项目id" align="center" prop="projectId" width="80px"/>
+      <el-table-column label="模板名称" align="center" prop="templateName"/>
+      <el-table-column label="模板描述" align="center" prop="templateDescription"/>
+      <el-table-column label="模板类型 " align="center" prop="templateType" width="80px">
         <template #default="scope">
-          <dict-tag :type="DICT_TYPE.TEMPLATE_TYPE" :value="scope.row.templateType" />
+          <dict-tag :type="DICT_TYPE.TEMPLATE_TYPE" :value="scope.row.templateType"/>
         </template>
       </el-table-column>
-      <el-table-column label="模板类型值" align="center" prop="templateTypeValue">
+      <el-table-column label="模板类型值" align="center" prop="templateTypeValue" width="100px">
         <template #default="scope">
-          <dict-tag :type="DICT_TYPE.TEMPLATE_TYPE_VALUE" :value="scope.row.templateTypeValue" />
+          <dict-tag :type="DICT_TYPE.TEMPLATE_TYPE_VALUE" :value="scope.row.templateTypeValue"/>
         </template>
       </el-table-column>
-      <el-table-column label="文件类型" align="center" prop="fileType">
+      <el-table-column label="文件类型" align="center" prop="fileType" width="80px">
         <template #default="scope">
-          <dict-tag :type="DICT_TYPE.CODE_FILE_TYPE" :value="scope.row.fileType" />
+          <dict-tag :type="DICT_TYPE.CODE_FILE_TYPE" :value="scope.row.fileType"/>
         </template>
       </el-table-column>
-      <el-table-column label="文件路径" align="center" prop="filePathExpression" />
-      <el-table-column label="原始路径" align="center" prop="originalPath" />
+      <el-table-column label="文件路径" align="center" prop="filePathExpression"/>
+      <el-table-column label="原始路径" align="center" prop="originalPath"/>
       <el-table-column
         label="创建时间"
         align="center"
@@ -186,21 +194,21 @@
   </ContentWrap>
 
   <!-- 表单弹窗：添加/修改 -->
-  <CodeTemplateForm ref="formRef" @success="getList" />
+  <CodeTemplateForm ref="formRef" @success="getList"/>
 </template>
 
 <script setup lang="ts">
-import { getStrDictOptions, DICT_TYPE } from '@/utils/dict'
-import { dateFormatter } from '@/utils/formatTime'
+import {DICT_TYPE, getStrDictOptions} from '@/utils/dict'
+import {dateFormatter} from '@/utils/formatTime'
 import download from '@/utils/download'
-import { CodeTemplateApi, CodeTemplateVO } from '@/api/ucg/codetemplate'
+import {CodeTemplateApi, CodeTemplateVO} from '@/api/ucg/codetemplate'
 import CodeTemplateForm from './CodeTemplateForm.vue'
 
 /** 存储代码模板的基本信息 列表 */
-defineOptions({ name: 'CodeTemplate' })
+defineOptions({name: 'CodeTemplate'})
 
 const message = useMessage() // 消息弹窗
-const { t } = useI18n() // 国际化
+const {t} = useI18n() // 国际化
 
 const loading = ref(true) // 列表的加载中
 const list = ref<CodeTemplateVO[]>([]) // 列表的数据
@@ -234,6 +242,7 @@ const getList = async () => {
   }
 }
 
+
 /** 搜索按钮操作 */
 const handleQuery = () => {
   queryParams.pageNo = 1
@@ -243,6 +252,7 @@ const handleQuery = () => {
 /** 重置按钮操作 */
 const resetQuery = () => {
   queryFormRef.value.resetFields()
+  router.push({query: {}})
   handleQuery()
 }
 
@@ -262,7 +272,8 @@ const handleDelete = async (id: number) => {
     message.success(t('common.delSuccess'))
     // 刷新列表
     await getList()
-  } catch {}
+  } catch {
+  }
 }
 
 /** 导出按钮操作 */
@@ -279,9 +290,13 @@ const handleExport = async () => {
     exportLoading.value = false
   }
 }
+const route = useRoute()
+const router = useRouter()
 
 /** 初始化 **/
 onMounted(() => {
+  const query = route.query
+  queryParams.projectId = query.projectId ? Number(query.projectId) : undefined
   getList()
 })
 </script>

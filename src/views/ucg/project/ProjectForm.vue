@@ -107,9 +107,12 @@ const submitForm = async () => {
     if (formType.value === 'create') {
       await ProjectApi.createProject(data)
       message.success(t('common.createSuccess'))
-    } else {
+    } else if (formType.value === 'update')  {
       await ProjectApi.updateProject(data)
       message.success(t('common.updateSuccess'))
+    }else if (formType.value === 'copy')  {
+      await ProjectApi.copyProject(data)
+      message.success(t('common.createSuccess'))
     }
     dialogVisible.value = false
     // 发送操作成功的事件

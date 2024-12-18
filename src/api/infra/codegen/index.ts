@@ -98,12 +98,12 @@ export const syncCodegenFromDB = (id: number) => {
 
 // 预览生成代码
 export const previewCodegen = (id: number) => {
-  return request.get({ url: '/infra/codegen/preview?tableId=' + id })
+  return request.get({ url: '/infra/codegen/preview?tableIds=' + id })
 }
 
 // 下载生成代码
 export const downloadCodegen = (id: number) => {
-  return request.download({ url: '/infra/codegen/download?tableId=' + id })
+  return request.download({ url: '/infra/codegen/download?tableIds=' + id })
 }
 
 // 获得表定义

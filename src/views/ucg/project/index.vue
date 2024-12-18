@@ -44,15 +44,22 @@
         />
       </el-form-item>
       <el-form-item>
-        <el-button @click="handleQuery"><Icon icon="ep:search" class="mr-5px" /> 搜索</el-button>
-        <el-button @click="resetQuery"><Icon icon="ep:refresh" class="mr-5px" /> 重置</el-button>
+        <el-button @click="handleQuery">
+          <Icon icon="ep:search" class="mr-5px"/>
+          搜索
+        </el-button>
+        <el-button @click="resetQuery">
+          <Icon icon="ep:refresh" class="mr-5px"/>
+          重置
+        </el-button>
         <el-button
           type="primary"
           plain
           @click="openForm('create')"
           v-hasPermi="['ucg:project:create']"
         >
-          <Icon icon="ep:plus" class="mr-5px" /> 新增
+          <Icon icon="ep:plus" class="mr-5px"/>
+          新增
         </el-button>
         <el-button
           type="success"
@@ -61,7 +68,8 @@
           :loading="exportLoading"
           v-hasPermi="['ucg:project:export']"
         >
-          <Icon icon="ep:download" class="mr-5px" /> 导出
+          <Icon icon="ep:download" class="mr-5px"/>
+          导出
         </el-button>
       </el-form-item>
     </el-form>
@@ -75,17 +83,17 @@
         <template #default="scope">
           <el-tabs model-value="projectVariable">
             <el-tab-pane label="存储与项目相关的变量信息" name="projectVariable">
-              <ProjectVariableList :project-id="scope.row.id" />
+              <ProjectVariableList :project-id="scope.row.id"/>
             </el-tab-pane>
           </el-tabs>
         </template>
       </el-table-column>
-      <el-table-column label="编号" align="center" prop="id" />
-      <el-table-column label="项目名称" align="center" prop="projectName" />
-      <el-table-column label="项目描述" align="center" prop="projectDescription" />
+      <el-table-column label="编号" align="center" prop="id"/>
+      <el-table-column label="项目名称" align="center" prop="projectName"/>
+      <el-table-column label="项目描述" align="center" prop="projectDescription"/>
       <el-table-column label="启动状态" align="center" prop="enableStatus">
         <template #default="scope">
-          <dict-tag :type="DICT_TYPE.ENABLE_STATUS" :value="scope.row.enableStatus" />
+          <dict-tag :type="DICT_TYPE.ENABLE_STATUS" :value="scope.row.enableStatus"/>
         </template>
       </el-table-column>
       <el-table-column
@@ -104,6 +112,22 @@
             v-hasPermi="['ucg:project:update']"
           >
             编辑
+          </el-button>
+          <el-button
+            link
+            type="primary"
+            @click="openForm('copy', scope.row.id)"
+            v-hasPermi="['ucg:project:create']"
+          >
+            复制
+          </el-button>
+          <el-button
+            link
+            type="primary"
+            @click="toEditCodeTemplate( scope.row.id)"
+            v-hasPermi="['ucg:code-template:create']"
+          >
+            查看代码模板
           </el-button>
           <el-button
             link
@@ -126,22 +150,22 @@
   </ContentWrap>
 
   <!-- 表单弹窗：添加/修改 -->
-  <ProjectForm ref="formRef" @success="getList" />
+  <ProjectForm ref="formRef" @success="getList"/>
 </template>
 
 <script setup lang="ts">
-import { getBoolDictOptions, DICT_TYPE } from '@/utils/dict'
-import { dateFormatter } from '@/utils/formatTime'
+import {DICT_TYPE, getBoolDictOptions} from '@/utils/dict'
+import {dateFormatter} from '@/utils/formatTime'
 import download from '@/utils/download'
-import { ProjectApi, ProjectVO } from '@/api/ucg/project'
+import {ProjectApi, ProjectVO} from '@/api/ucg/project'
 import ProjectForm from './ProjectForm.vue'
 import ProjectVariableList from './components/ProjectVariableList.vue'
 
 /** 存储项目的基本信息 列表 */
-defineOptions({ name: 'Project' })
+defineOptions({name: 'Project'})
 
 const message = useMessage() // 消息弹窗
-const { t } = useI18n() // 国际化
+const {t} = useI18n() // 国际化
 
 const loading = ref(true) // 列表的加载中
 const list = ref<ProjectVO[]>([]) // 列表的数据
@@ -197,7 +221,8 @@ const handleDelete = async (id: number) => {
     message.success(t('common.delSuccess'))
     // 刷新列表
     await getList()
-  } catch {}
+  } catch {
+  }
 }
 
 /** 导出按钮操作 */
@@ -215,6 +240,14 @@ const handleExport = async () => {
   }
 }
 
+const router = useRouter();
+/** 查看代码模板 */
+const toEditCodeTemplate = (id: number) => {
+  router.push({
+    path: '/infra/codetemplate',
+    query: {projectId: id}
+  });
+}
 /** 初始化 **/
 onMounted(() => {
   getList()

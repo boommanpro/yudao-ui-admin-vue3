@@ -6,6 +6,21 @@
     title="代码预览"
     width="80%"
   >
+
+    <template #title>
+      <div class="flex items-center justify-between">
+        <span>代码预览</span>
+        <el-button
+          v-hasPermi="['infra:codegen:download']"
+          type="primary"
+          @click="handleGenTable()"
+        >
+          生成代码
+        </el-button>
+      </div>
+    </template>
+
+
     <div class="flex">
       <!-- 代码目录树 -->
       <el-card
@@ -55,8 +70,8 @@
   </Dialog>
 </template>
 <script lang="ts" setup>
-import { useClipboard } from '@vueuse/core'
-import { handleTree2 } from '@/utils/tree'
+import {useClipboard} from '@vueuse/core'
+import {handleTree2} from '@/utils/tree'
 import * as CodegenApi from '@/api/infra/codegen'
 
 import hljs from 'highlight.js' // 导入代码高亮文件
@@ -66,10 +81,11 @@ import xml from 'highlight.js/lib/languages/java'
 import javascript from 'highlight.js/lib/languages/javascript'
 import sql from 'highlight.js/lib/languages/sql'
 import typescript from 'highlight.js/lib/languages/typescript'
+import download from "@/utils/download";
 
-defineOptions({ name: 'InfraCodegenPreviewCode' })
+defineOptions({name: 'InfraCodegenPreviewCode'})
 
-const { t } = useI18n() // 国际化
+const {t} = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 
 const dialogVisible = ref(false) // 弹窗的是否展示
@@ -95,8 +111,11 @@ interface filesType {
   parentId: string
 }
 
+const selectTableIds = ref<number>(0)
+
 /** 打开弹窗 */
 const open = async (id: number) => {
+  selectTableIds.value = id;
   dialogVisible.value = true
   try {
     loading.value = true
@@ -112,7 +131,13 @@ const open = async (id: number) => {
     loading.value = false
   }
 }
-defineExpose({ open }) // 提供 open 方法，用于打开弹窗
+
+const handleGenTable = async () => {
+  const res = await CodegenApi.downloadCodegen(selectTableIds.value)
+  download.zip(res, 'codegen-' + selectTableIds.value + '.zip')
+}
+
+defineExpose({open}) // 提供 open 方法，用于打开弹窗
 
 /** 处理文件 */
 const handleFiles = (datas: CodegenApi.CodegenPreviewVO[]) => {
@@ -180,7 +205,7 @@ const handleFiles = (datas: CodegenApi.CodegenPreviewVO[]) => {
 
 /** 复制 **/
 const copy = async (text: string) => {
-  const { copy, copied, isSupported } = useClipboard({ source: text })
+  const {copy, copied, isSupported} = useClipboard({source: text})
   if (!isSupported) {
     message.error(t('common.copyError'))
     return
@@ -199,6 +224,7 @@ const highlightedCode = (item) => {
   const result = hljs.highlight(language, item.code || '', true)
   return result.value || '&nbsp;'
 }
+
 
 /** 初始化 **/
 onMounted(async () => {
