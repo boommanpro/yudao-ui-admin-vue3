@@ -128,13 +128,26 @@
           <Icon icon="ep:download" class="mr-5px"/>
           导出
         </el-button>
+        <el-button
+          type="danger"
+          plain
+          @click="handleBatchDelete"
+          :disabled="multipleSelection.length === 0"
+          v-hasPermi="['ucg:code-template:delete']"
+        >
+          <Icon icon="ep:delete" class="mr-5px"/>
+          批量删除
+        </el-button>
       </el-form-item>
     </el-form>
   </ContentWrap>
 
   <!-- 列表 -->
   <ContentWrap>
-    <el-table v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="true">
+    <el-table v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="true"
+              @selection-change="handleSelectionChange"
+    >
+      <el-table-column type="selection" width="30" align="center"/>
       <el-table-column label="编号" align="center" prop="id" width="80px"/>
       <el-table-column label="项目id" align="center" prop="projectId" width="80px"/>
       <el-table-column label="模板名称" align="center" prop="templateName"/>
@@ -215,7 +228,7 @@ const list = ref<CodeTemplateVO[]>([]) // 列表的数据
 const total = ref(0) // 列表的总页数
 const queryParams = reactive({
   pageNo: 1,
-  pageSize: 10,
+  pageSize: 100,
   projectId: undefined,
   templateName: undefined,
   templateDescription: undefined,
@@ -292,6 +305,45 @@ const handleExport = async () => {
 }
 const route = useRoute()
 const router = useRouter()
+
+// 在 defineOptions 和其他响应式变量定义之后
+const multipleSelection = ref<CodeTemplateVO[]>([])
+
+/**
+ * 处理表格多选变化
+ * @param selections 当前选中的数据行集合
+ */
+const handleSelectionChange = (selections: CodeTemplateVO[]) => {
+  multipleSelection.value = selections
+}
+
+
+/**
+ * 批量删除按钮操作
+ */
+const handleBatchDelete = async () => {
+  if (multipleSelection.value.length === 0) {
+    message.warning('请先选择要删除的记录')
+    return
+  }
+
+  try {
+    // 删除的二次确认
+    await message.delConfirm()
+
+    // 获取所有选中的 ID
+    for (const item of multipleSelection.value) {
+      await CodeTemplateApi.deleteCodeTemplate(item.id!)
+    }
+    message.success(t('common.delSuccess'))
+
+    // 刷新列表
+    await getList()
+  } catch (error) {
+    console.error(error)
+    message.error('批量删除失败')
+  }
+}
 
 /** 初始化 **/
 onMounted(() => {
